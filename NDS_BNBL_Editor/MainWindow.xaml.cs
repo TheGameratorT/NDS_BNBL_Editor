@@ -131,7 +131,7 @@ namespace NDS_BNBL_Editor
             currentTouchObj_UpDown.Value = (int)(sender as Button).Tag;
         }
 
-        private void updateCurrentObjectBeingEdited(object sender, RoutedPropertyChangedEventArgs<object> e)
+        private void ObjectClicked(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
             if ( currentTouchObj_UpDown != null && numberOfTouchObjs_UpDown != null)
             {
@@ -212,7 +212,7 @@ namespace NDS_BNBL_Editor
             }
         }
 
-        async private void positionChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        async private void valueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
             byte v1 = (byte)currentTouchObj_UpDown.Value;
             if (objn_button[v1] != null)
@@ -226,6 +226,22 @@ namespace NDS_BNBL_Editor
                 objn_button[v1].Margin = new Thickness(objn_xPos[v1] + 264, objn_yPos[v1] + 93, 0, 0);
                 objn_button[v1].Width = objn_width[v1];
                 objn_button[v1].Height = objn_height[v1];
+            }
+
+            for (int i = 1; i < objn_button.Length; i++)
+            {
+                if(objn_button[i] != null)
+                {
+                    if (objn_width[i] <= 48)
+                    {
+                        objn_button[i].Content = i;
+                    }
+
+                    if (objn_width[i] > 48)
+                    {
+                        objn_button[i].Content = string.Format("Object {0}", i);
+                    }
+                }
             }
         }
 
@@ -261,7 +277,7 @@ namespace NDS_BNBL_Editor
                     return;
                 }
 
-                for (byte i = 1; i <= numberOfTouchObjs_UpDown.Value; i++)
+                for (int i = 1; i <= numberOfTouchObjs_UpDown.Value; i++)
                 {
                     saveFileFromDialog_writer.BaseStream.Position = 0x8 - 0x6 + (i * 0x6);
                     saveFileFromDialog_writer.BaseStream.WriteByte(objn_xPos[i]);
