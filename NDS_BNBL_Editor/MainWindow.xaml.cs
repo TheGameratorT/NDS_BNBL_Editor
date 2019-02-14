@@ -18,6 +18,11 @@ namespace NDS_BNBL_Editor
         public MainWindow()
         {
             InitializeComponent();
+
+            if (App.ExeArgs.Length > 0)
+            {
+                loadBNBLfile(App.ExeArgs[0]);
+            }
         }
 
         Button[] objn_button = new Button[256];
@@ -43,87 +48,94 @@ namespace NDS_BNBL_Editor
                     objn_button[i] = null;
                 }
 
-                BinaryReader openedFileData_reader = new BinaryReader(File.Open(openFileDlg.FileName, FileMode.Open));
-                string v1 = Encoding.UTF8.GetString(openedFileData_reader.ReadBytes(4));
-
-                openedFileData_reader.BaseStream.Position = 0x6;
-                numberOfTouchObjs_UpDown.Value = openedFileData_reader.ReadByte();
-
-                if (v1 != "JNBL")
-                {
-                    MessageBox.Show("This is not a valid BNBL file!", "Ups!", MessageBoxButton.OK, MessageBoxImage.Information);
-                    openedFileData_reader.Close();
-                    return;
-                }
-                
-                for (int i = 1; i <= numberOfTouchObjs_UpDown.Value; i++)
-                {
-                    objn_button[i] = new Button()
-                    {
-                        Opacity = 0.75,
-                        VerticalAlignment = VerticalAlignment.Top,
-                        HorizontalAlignment = HorizontalAlignment.Left,
-                        Content = string.Format("Object {0}", i),
-                        Name = string.Format("ObjectN_Button_{0}", i),
-                        Tag = i
-                    };
-                    objn_button[i].Click += new RoutedEventHandler(objn_Click);
-                    WindowGrid.Children.Add(objn_button[i]);
-
-                    openedFileData_reader.BaseStream.Position = 0x8 - 0x6 + (i*0x6);
-                    ushort xPosUInt16 = openedFileData_reader.ReadUInt16();
-                    byte xPosUInt12 = (byte)(xPosUInt16 & 0xFFF);
-                    byte xPosAlignmentByte = (byte)(xPosUInt16 >> 12 & 3);
-                    objn_xPos[i] = xPosUInt12;
-
-                    openedFileData_reader.BaseStream.Position = 0xA - 0x6 + (i * 0x6);
-                    ushort yPosUInt16 = openedFileData_reader.ReadUInt16();
-                    byte yPosUInt12 = (byte)(yPosUInt16 & 0xFFF);
-                    byte yPosAlignmentByte = (byte)(yPosUInt16 >> 12 & 3);
-                    objn_yPos[i] = yPosUInt12;
-
-                    openedFileData_reader.BaseStream.Position = 0xC - 0x6 + (i * 0x6);
-                    byte widthByte = openedFileData_reader.ReadByte();
-                    objn_width[i] = widthByte;
-
-                    openedFileData_reader.BaseStream.Position = 0xD - 0x6 + (i * 0x6);
-                    byte heightByte = openedFileData_reader.ReadByte();
-                    objn_height[i] = heightByte;
-
-                    //Do some calculations
-                    if (xPosAlignmentByte == 1) //If X is centered
-                    {
-                        objn_xPos[i] -= (byte)((widthByte + 1) / 2);
-                    }
-                    else if (xPosAlignmentByte == 2) //If X is set to Bottom/Right
-                    {
-                        objn_xPos[i] -= widthByte;
-                    }
-
-                    if (yPosAlignmentByte == 1) //If Y is centered
-                    {
-                        objn_yPos[i] -= (byte)((heightByte + 1) / 2);
-                    }
-                    else if(yPosAlignmentByte == 2) //If Y is set to Bottom/Right
-                    {
-                        objn_yPos[i] -= heightByte;
-                    }
-
-                    objn_button[i].Margin = new Thickness(objn_xPos[i] + 264, objn_yPos[i] + 93, 0, 0);
-                    objn_button[i].Width = objn_width[i];
-                    objn_button[i].Height = objn_height[i];
-
-                    xPos_UpDown.Value = objn_xPos[1];
-                    yPos_UpDown.Value = objn_yPos[1];
-                    width_UpDown.Value = objn_width[1];
-                    height_UpDown.Value = objn_height[1];
-
-                    objn_button[1].Background = Brushes.Yellow;
-                }
-                openedFileData_reader.Close();
-                currentTouchObj_UpDown.Value = 1;
-                allowedToCreateButtons = true;
+                loadBNBLfile(openFileDlg.FileName);
             }
+        }
+
+        public void loadBNBLfile(string BNBLpath)
+        {
+            allowedToCreateButtons = false;
+
+            BinaryReader openedFileData_reader = new BinaryReader(File.Open(BNBLpath, FileMode.Open));
+            string v1 = Encoding.UTF8.GetString(openedFileData_reader.ReadBytes(4));
+
+            openedFileData_reader.BaseStream.Position = 0x6;
+            numberOfTouchObjs_UpDown.Value = openedFileData_reader.ReadByte();
+
+            if (v1 != "JNBL")
+            {
+                MessageBox.Show("This is not a valid BNBL file!", "Ups!", MessageBoxButton.OK, MessageBoxImage.Information);
+                openedFileData_reader.Close();
+                return;
+            }
+
+            for (int i = 1; i <= numberOfTouchObjs_UpDown.Value; i++)
+            {
+                objn_button[i] = new Button()
+                {
+                    Opacity = 0.75,
+                    VerticalAlignment = VerticalAlignment.Top,
+                    HorizontalAlignment = HorizontalAlignment.Left,
+                    Content = string.Format("Object {0}", i),
+                    Name = string.Format("ObjectN_Button_{0}", i),
+                    Tag = i
+                };
+                objn_button[i].Click += new RoutedEventHandler(objn_Click);
+                WindowGrid.Children.Add(objn_button[i]);
+
+                openedFileData_reader.BaseStream.Position = 0x8 - 0x6 + (i * 0x6);
+                ushort xPosUInt16 = openedFileData_reader.ReadUInt16();
+                byte xPosUInt12 = (byte)(xPosUInt16 & 0xFFF);
+                byte xPosAlignmentByte = (byte)(xPosUInt16 >> 12 & 3);
+                objn_xPos[i] = xPosUInt12;
+
+                openedFileData_reader.BaseStream.Position = 0xA - 0x6 + (i * 0x6);
+                ushort yPosUInt16 = openedFileData_reader.ReadUInt16();
+                byte yPosUInt12 = (byte)(yPosUInt16 & 0xFFF);
+                byte yPosAlignmentByte = (byte)(yPosUInt16 >> 12 & 3);
+                objn_yPos[i] = yPosUInt12;
+
+                openedFileData_reader.BaseStream.Position = 0xC - 0x6 + (i * 0x6);
+                byte widthByte = openedFileData_reader.ReadByte();
+                objn_width[i] = widthByte;
+
+                openedFileData_reader.BaseStream.Position = 0xD - 0x6 + (i * 0x6);
+                byte heightByte = openedFileData_reader.ReadByte();
+                objn_height[i] = heightByte;
+
+                //Do some calculations
+                if (xPosAlignmentByte == 1) //If X is centered
+                {
+                    objn_xPos[i] -= (byte)((widthByte + 1) / 2);
+                }
+                else if (xPosAlignmentByte == 2) //If X is set to Bottom/Right
+                {
+                    objn_xPos[i] -= widthByte;
+                }
+
+                if (yPosAlignmentByte == 1) //If Y is centered
+                {
+                    objn_yPos[i] -= (byte)((heightByte + 1) / 2);
+                }
+                else if (yPosAlignmentByte == 2) //If Y is set to Bottom/Right
+                {
+                    objn_yPos[i] -= heightByte;
+                }
+
+                objn_button[i].Margin = new Thickness(objn_xPos[i] + 264, objn_yPos[i] + 93, 0, 0);
+                objn_button[i].Width = objn_width[i];
+                objn_button[i].Height = objn_height[i];
+
+                xPos_UpDown.Value = objn_xPos[1];
+                yPos_UpDown.Value = objn_yPos[1];
+                width_UpDown.Value = objn_width[1];
+                height_UpDown.Value = objn_height[1];
+
+                objn_button[1].Background = Brushes.Yellow;
+            }
+            openedFileData_reader.Close();
+            currentTouchObj_UpDown.Value = 1;
+            allowedToCreateButtons = true;
         }
 
         void objn_Click(object sender, RoutedEventArgs e)
