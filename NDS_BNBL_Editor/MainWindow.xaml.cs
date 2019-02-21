@@ -272,13 +272,12 @@ namespace NDS_BNBL_Editor
             {
                 BinaryWriter saveFileFromDialog_writer = new BinaryWriter(File.Open(saveFileDialog1.FileName, FileMode.Create));
 
-                saveFileFromDialog_writer.BaseStream.WriteByte(Encoding.ASCII.GetBytes("J")[0]);
-                saveFileFromDialog_writer.BaseStream.Position = 0x1;
-                saveFileFromDialog_writer.BaseStream.WriteByte(Encoding.ASCII.GetBytes("N")[0]);
-                saveFileFromDialog_writer.BaseStream.Position = 0x2;
-                saveFileFromDialog_writer.BaseStream.WriteByte(Encoding.ASCII.GetBytes("B")[0]);
-                saveFileFromDialog_writer.BaseStream.Position = 0x3;
-                saveFileFromDialog_writer.BaseStream.WriteByte(Encoding.ASCII.GetBytes("L")[0]);
+                byte[] JNBL = Encoding.ASCII.GetBytes("JNBL");
+                for (int i = 0; i < JNBL.Length; i++)
+                {
+                    saveFileFromDialog_writer.BaseStream.WriteByte(JNBL[i]);
+                    saveFileFromDialog_writer.BaseStream.Position = 0x1 + i;
+                }
 
                 saveFileFromDialog_writer.BaseStream.Position = 0x6;
                 saveFileFromDialog_writer.BaseStream.WriteByte((byte)numberOfTouchObjs_UpDown.Value);
