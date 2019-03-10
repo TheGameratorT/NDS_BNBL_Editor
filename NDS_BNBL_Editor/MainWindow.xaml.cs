@@ -57,7 +57,7 @@ namespace NDS_BNBL_Editor
             allowedToCreateButtons = false;
 
             BinaryReader openedFileData_reader = new BinaryReader(File.Open(BNBLpath, FileMode.Open));
-            string v1 = Encoding.UTF8.GetString(openedFileData_reader.ReadBytes(4));
+            string v1 = Encoding.ASCII.GetString(openedFileData_reader.ReadBytes(4));
 
             openedFileData_reader.BaseStream.Position = 0x6;
             numberOfTouchObjs_UpDown.Value = openedFileData_reader.ReadByte();
@@ -208,19 +208,22 @@ namespace NDS_BNBL_Editor
 
         private void openImage_Click(object sender, RoutedEventArgs e)
         {
-            OpenFileDialog openFileDlg = new OpenFileDialog();
-            openFileDlg.Filter = "All supported image formats|*bmp; *gif; *.jpg; *.jpeg; *.jpe; *.jif; *.jfif; *.jfi; *png; *.tiff; *.tif|" +
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.Filter = "All supported image formats|*bmp; *gif; *.jpg; *.jpeg; *.jpe; *.jif; *.jfif; *.jfi; *png; *.tiff; *.tif|" +
                 "Bitmap images|*.bmp|" +
                 "GIF images|*.gif|" +
                 "JPEG images|*.jpg; *.jpeg; *.jpe; *.jif; *.jfif; *.jfi|" +
                 "PNG images|*.png|" +
                 "TIFF images|*.tiff; *.tif|" +
                 "All files|*.*";
-            bool? openFileDlg_result = openFileDlg.ShowDialog();
 
-            if (openFileDlg_result == true)
+            if (openFileDialog.ShowDialog() == true)
             {
-                guideImage.Source = new BitmapImage(new Uri(openFileDlg.FileName));
+                BitmapImage bmpImg = new BitmapImage();
+                bmpImg.BeginInit();
+                bmpImg.UriSource = new Uri(openFileDialog.FileName);
+                bmpImg.EndInit();
+                guideImage.Source = bmpImg;
             }
         }
 

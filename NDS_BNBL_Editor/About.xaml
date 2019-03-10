@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:NDS_BNBL_Editor"
         mc:Ignorable="d"
-        Title="About" Height="450" Width="400">
+        Title="About" Height="450" Width="400" ResizeMode="CanMinimize">
     <Grid>
         <Label Content="Thanks to everyone who helped making this tool possible!" HorizontalAlignment="Left" Margin="10,283,0,0" VerticalAlignment="Top" Width="374" FontWeight="Bold"/>
         <Label Content="- TheGameratorT&#x9;&#x9;(Program Developer)&#xA;- RoadrunnerWMC&#x9;(BNBL Structure Research - Alignment)&#xA;- Ray&#x9;&#x9;&#x9;(BNBL Structure Research)&#xA;- Shibboleet&#x9;&#x9;(BinaryReader Help)" HorizontalAlignment="Left" Margin="10,314,0,0" VerticalAlignment="Top" Height="96" Width="374"/>
