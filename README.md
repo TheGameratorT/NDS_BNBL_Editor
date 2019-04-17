@@ -3,7 +3,7 @@ This application supported by a GUI and 2D Viewer allows to easly edit BNBL file
 
 # Windows:
 Requirements:
- - .NET Framework 4.6.1 or latest.
+ - .NET Framework 4.6 or latest.
 
 ![alt text](https://raw.githubusercontent.com/TheGameratorT/NDS_BNBL_Editor/master/NDS_BNBL_Editor/example.png)
 
